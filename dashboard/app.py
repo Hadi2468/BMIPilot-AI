@@ -85,7 +85,9 @@ INK_STRONG = "#ffffff" if DARK else "#0b0b0b"
 SURFACE = "#1a1a19" if DARK else "#fcfcfb"
 POINT = "#3987e5" if DARK else "#2a78d6"  # the person: series slot 1
 NEUTRAL_MID = "#383835" if DARK else "#f0efec"
-HEALTHY_ZONE = "#0ca30c"  # status "good"; always paired with a text label
+CURVE = "#f48fb8" if DARK else "#b8336a"  # pink/magenta reference curves
+HEALTHY_ZONE = "#d55181" if DARK else "#e87ba4"  # magenta healthy zone, text-labelled
+ZONE_OPACITY = 0.28 if DARK else 0.18
 # Adult scale is diverging around "Normal": blue arm (under), red arm (over).
 ADULT_BANDS = [
     ("Severe thinness", 12.0, 16.0, "#256abf" if DARK else "#6da7ec"),
@@ -159,7 +161,7 @@ def growth_chart(group: str, profile: dict[str, Any], a: dict[str, Any]) -> alt.
     y = alt.Y("bmi:Q", title="BMI (kg/m²)", scale=alt.Scale(zero=False))
     zone = (
         alt.Chart(df)
-        .mark_area(color=HEALTHY_ZONE, opacity=0.14)
+        .mark_area(color=HEALTHY_ZONE, opacity=ZONE_OPACITY)
         .encode(x=x, y=alt.Y(f"{healthy[0]}:Q"), y2=f"{healthy[1]}:Q")
     )
     first = df.iloc[[len(df) // 2]].assign(bmi=lambda d: (d[healthy[0]] + d[healthy[1]]) / 2)
@@ -170,7 +172,7 @@ def growth_chart(group: str, profile: dict[str, Any], a: dict[str, Any]) -> alt.
     )
     lines = (
         alt.Chart(long)
-        .mark_line(strokeWidth=2, color=INK)
+        .mark_line(strokeWidth=2, color=CURVE)
         .encode(
             x=x,
             y=y,
@@ -187,7 +189,7 @@ def growth_chart(group: str, profile: dict[str, Any], a: dict[str, Any]) -> alt.
     last = long[long.age_years == long.age_years.max()]
     labels = (
         alt.Chart(last)
-        .mark_text(align="left", dx=6, fontSize=11, color=INK)
+        .mark_text(align="left", dx=6, fontSize=11, color=CURVE)
         .encode(x=x, y=y, text="curve:N")
     )
     me = pd.DataFrame(
