@@ -141,7 +141,7 @@ docker compose up --build                 # API on :8000, dashboard on :8501
 
 ## 📊 Sample runs
 
-Real output from `gpt-4o-mini` (about 7 s per full run):
+Real output from `gpt-4o-mini` (about 5-7 s per full run):
 
 | Person | Method | BMI | Result | Plan highlights |
 |---|---|---|---|---|
@@ -149,6 +149,23 @@ Real output from `gpt-4o-mini` (about 7 s per full run):
 | Boy, **9 years**, 38 kg, 135 cm | CDC percentile | 20.9 | Overweight (percentile 94.6) | Beginner cardio from the database, made playful; family habits, no weight target |
 | Woman, **49 years**, 62 kg, 157 cm | WHO adult | 25.2 | Overweight (BMI Prime 1.01) | Beginner cardio, whole-food diet tip, sleep routine; lose ~0.6 kg to the healthy range |
 | Man, **82 years**, 95 kg, 170 cm | WHO adult | 32.9 | Obesity class I | Policy forced beginner cardio; the LLM judged the results unsafe and switched to brisk walking, chair-based and balance exercises; protein-rich diet tip |
+
+---
+
+## 🔭 Observability
+
+Every run is traced end to end in LangSmith: each graph node, each LLM call with its tokens,
+the exercise tool call and the final report. Traces are named `bmipilot` and tagged with the
+model and the age group (`infant_toddler`, `child_teen`, `adult`), so runs from the CLI, API
+and dashboard can be filtered by method.
+
+A full adult run on `gpt-4o-mini`: **~5 s, ~2.2K tokens, well under one cent**. The trace shows
+the parallel fan-out at work: diet (2.1 s), exercise (3.3 s, two LLM calls around the tool)
+and lifestyle (1.7 s) run concurrently, so the total is the slowest branch plus the
+explanation, not the sum (~8.6 s).
+
+![LangSmith trace of a BMIPilot run](assets/langsmith.png)
+*A BMIPilot AI trace in LangSmith*
 
 ---
 
