@@ -2,9 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Any
+import os
 
-import pytest
+# Never send test runs to LangSmith. Set before any app import: load_dotenv() does not
+# override existing variables, so a developer's .env cannot switch tracing back on.
+os.environ["LANGSMITH_TRACING"] = "false"
+os.environ["LANGCHAIN_TRACING_V2"] = "false"
+
+from typing import Any  # noqa: E402
+
+import pytest  # noqa: E402
 from langchain_core.messages import AIMessage
 from langchain_core.runnables import RunnableLambda
 
